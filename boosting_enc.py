@@ -1,8 +1,453 @@
-#__________________| INFO |___________________#
-#______SCRIPT ENCRYPTED BY PYTHON 3.0
-#______CODING BY: U7P4L 1N
-#______GITHUB : https://github.com/U7P4L-IN
-#________________| SCRIPT DATA |_____________#
+import os
+import time
+import requests
+import random
+import asyncio
+import aiohttp
+import uuid
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
-import marshal,zlib,base64
-exec(marshal.loads(zlib.decompress(base64.b64decode(b'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'))))
+# Define colors for output
+# Reset color
+RESET = "\033[0m"
+
+# Regular colors
+BLACK = "\033[30m"
+RED = "\033[31m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+BLUE = "\033[34m"
+MAGENTA = "\033[35m"
+MAGENTA = "\033[36m"
+WHITE = "\033[37m"
+
+# Bright colors
+BRIGHT_BLACK = "\033[90m"
+BRIGHT_RED = "\033[91m"
+BRIGHT_GREEN = "\033[92m"
+BRIGHT_YELLOW = "\033[93m"
+BRIGHT_BLUE = "\033[94m"
+BRIGHT_MAGENTA = "\033[95m"
+BRIGHT_MAGENTA = "\033[96m"
+BRIGHT_WHITE = "\033[97m"
+
+MAX_WORKERS = 20  # Adjusted to your request for a thread pool size of 30
+
+# Function to clear the terminal
+def clear_terminal():
+    os.system('clear')
+
+ah = "xyva-"
+imt = "-M4786=="
+ak = " yva-"
+myid = uuid.uuid4().hex[:10].upper()
+
+async def key():
+    key1 = open('/data/data/com.termux/files/usr/bin/.exca.txt', 'r').read()
+    clear_terminal()
+    logo()
+    async with aiohttp.ClientSession() as sess:
+        async with sess.get('https://github.com/EzekielClervo/isaac/blob/fcc1b7a61333cddf99b6ce3eb5e03cdf6509f6ce/Approval.txt') as appro:
+            r1 = await appro.text()
+            if key1 in r1:
+                os.system('clear')
+                print("Your Key Is Approved")
+                time.sleep(3)  # Delay to show approval message
+                return True  # Indicate approval
+            else:
+                os.system("clear")
+                print("\t \033[1;32m First Get Approval\033[1;37m ")
+                time.sleep(5)
+                os.system("clear")
+                logo()
+                print("")
+                print(" YOU HAVE TO GET APPROVE FIRST BEFORE USING IT")
+                print("")
+                print(" Your Key is Not Approved ")
+                print("")
+                print(" Your Key : " + ak + ah + key1)
+                print("")
+                input(" Press Enter To Send Key")
+                time.sleep(3.5)
+                os.system('xdg-open https://www.messenger.com/t/100065316414713')
+                return False  # Indicate no approval
+
+def W_ueragnt():
+    chrome_version = random.randint(80, 99)
+    webkit_version = random.randint(500, 599)
+    safari_version = random.randint(400, 499)
+    windows_version = random.randint(8, 10)
+    is_win64 = random.choice([True, False])
+    
+    if is_win64:
+        user_agent = f'Mozilla/5.0 (Windows NT {windows_version}; Win64; x64) AppleWebKit/{webkit_version}.0 (KHTML, like Gecko) Chrome/{chrome_version}.0.0.0 Safari/{safari_version}.0'
+    else:
+        user_agent = f'Mozilla/5.0 (Windows NT {windows_version}; WOW64) AppleWebKit/{webkit_version}.0 (KHTML, like Gecko) Chrome/{chrome_version}.0.0.0 Safari/{safari_version}.0'
+    return user_agent
+
+def auto_unsubscribe(access_token, target_id):
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+        'User-Agent': W_ueragnt(),
+        'Content-Type': 'application/json'
+    }
+
+    url = f'https://graph.facebook.com/v14.0/{target_id}/subscribers'  # Correct endpoint for subscribers
+
+    try:
+        response = requests.delete(url, headers=headers)
+
+        if response.status_code == 200:
+            print(f"{YELLOW} SUCCESSFULLY | TARGET ID: {target_id} using token.{WHITE}")
+            return True  # Indicate success
+        else:
+            response_data = response.json()
+            print(f"{RED} FAILED | TARGET ID: {target_id}{WHITE}")
+            return False  # Indicate failure
+
+    except Exception as e:
+        print(f"{RED}( BOOST ) ERROR WHILE UNSUBSCRIBING | TARGET ID: {target_id}{WHITE}")
+        return False  # Indicate failure
+
+def clear_terminal():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def logo():
+    print(f"{BRIGHT_RED}═════════════════════════════════")    
+    print(f" _____             __            ")
+    print(f"  / ___/__ ____ ___ / /____ ____   ")
+    print(f" / /__/ _ `/ -_|_-</ __/ -_) __/   ")
+    print(f" \___/\_,_/\__/___/\__/\__/_/      ")
+    print(f"{BRIGHT_RED}OWNER : CAESTER")
+    print(f"{BRIGHT_RED}TYPE : FACEBOOK TOOL")
+    print(f"{BRIGHT_RED}═════════════════════════════════{WHITE}")
+
+def overview():
+    clear_terminal()
+    logo()
+    print(f"{YELLOW}Overview:")
+    print(f"{BRIGHT_BLUE}TOTAL RPA ACCOUNTS: {count_lines('/sdcard/BOOSTINGTOOL/rpa.txt')}")
+    print(f"{BRIGHT_BLUE}TOTAL FRA ACCOUNTS: {count_lines('/sdcard/BOOSTINGTOOL/fra.txt')}")
+    print(f"{BRIGHT_BLUE}TOTAL RPA PAGES: {count_lines('sdcard/BOOSTINGTOOL/rpapage.txt')}")
+    print(f"{BRIGHT_BLUE}TOTAL FRA PAGES: {count_lines('sdcard/BOOSTINGTOOL/frapage.txt')}")
+
+def count_lines(file_path):
+    try:
+        with open(file_path) as f:
+            return sum(1 for line in f)
+    except FileNotFoundError:
+        return 0
+
+def auto_react(post_ids, token_file, limit):
+    def react_to_post(token, post_id, reaction):
+        url = f"https://graph.facebook.com/{post_id}/reactions"
+        response = requests.post(url, params={'access_token': token, 'type': reaction})
+        
+        if response.status_code == 200:
+            print(f"{YELLOW}SUCCESSFUL | POST ID: {post_id}{WHITE}")
+            return True
+        else:
+            print(f"{RED}FAILED | POST ID: {post_id}{WHITE} - {response.json().get('error', {}).get('message', 'Unknown error')}")
+            return False
+
+    try:
+        with open(token_file, 'r') as file:
+            tokens = file.read().splitlines()
+
+        print(f"{YELLOW}Choose a reaction:")
+        print("1. Like")
+        print("2. Love")
+        print("3. Wow")
+        print("4. Haha")
+        print("5. Sad")
+        print("6. Angry")
+        print("7. Care")
+        chosen_reaction = input("Enter reaction type (1-7): ")
+        
+        reactions = ['LIKE', 'LOVE', 'WOW', 'HAHA', 'SAD', 'ANGRY', 'CARE']
+        
+        if chosen_reaction.isdigit() and 1 <= int(chosen_reaction) <= len(reactions):
+            reaction = reactions[int(chosen_reaction) - 1]
+        else:
+            print(f"{RED}INVALID REACTION TYPE.{WHITE}")
+            return
+
+        success_count = 0
+        failure_count = 0
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            futures = [
+                executor.submit(react_to_post, token, post_id.strip(), reaction)
+                for token in tokens[:limit]
+                for post_id in post_ids
+            ]
+            
+            for future in as_completed(futures):
+                if future.result():
+                    success_count += 1
+                else:
+                    failure_count += 1
+
+        print(f"{BRIGHT_BLUE}═════════════════════════════════")    
+        print(f"{BRIGHT_BLUE}| COMPLETED: {success_count}  |")
+        print(f"{BRIGHT_BLUE}| FAILED: {failure_count}     |")
+        print(f"{BRIGHT_BLUE}═════════════════════════════════")    
+
+    except Exception as e:
+        print(f"{RED}[ERROR] {str(e)}{WHITE}")
+
+import requests
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+def auto_comment(post_ids, token_file, limit):
+    def comment_on_post(token, post_id, comment):
+        url = f"https://graph.facebook.com/{post_id}/comments"
+        response = requests.post(url, params={'access_token': token, 'message': comment})
+        if response.status_code == 200:
+            print(f"{YELLOW}SUCCESSFUL | POST ID: {post_id}{WHITE}")
+            return True
+        else:
+            error_message = response.json().get('error', {}).get('message', 'Unknown error')
+            print(f"{RED}FAILED | POST ID: {post_id} - {error_message}{WHITE}")
+            return False
+
+    try:
+        with open(token_file, 'r') as file:
+            tokens = file.read().splitlines()
+
+        comments = input(f"{YELLOW}ENTER YOUR COMMENTS (separate by commas): ").split(',')
+        target_count = int(input(f"{YELLOW}ENTER TARGET COMMENT COUNT PER POST: {WHITE}"))
+
+        # Limit the number of tokens used
+        tokens = tokens[:min(limit, len(tokens))]
+
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            success_count = 0
+            futures = []
+
+            for post_id in post_ids:
+                post_comment_count = 0
+                while post_comment_count < target_count:
+                    for token in tokens:
+                        comment = comments[post_comment_count % len(comments)].strip()  # Cycle through comments
+                        futures.append(executor.submit(comment_on_post, token, post_id, comment))
+                        post_comment_count += 1
+                        if post_comment_count >= target_count:
+                            break  # Stop if target count is reached
+
+            success_count = 0
+            failure_count = 0
+            for future in as_completed(futures):
+                if future.result():
+                    success_count += 1
+                else:
+                    failure_count += 1
+
+            print(f"{BRIGHT_BLUE}═════════════════════════════════")    
+            print(f"| COMPLETED: {success_count}  |")
+            print(f"| FAILED: {failure_count}     |")
+            print(f"{BRIGHT_BLUE}═════════════════════════════════")    
+
+    except Exception as e:
+        print(f"{BRIGHT_BLUE}[ERROR] {str(e)}{WHITE}")
+
+def auto_react_to_comments(post_ids, token_file, limit, reaction_type):
+    def react_to_comment(token, comment_id):
+        url = f"https://graph.facebook.com/{comment_id}/reactions"
+        payload = {
+            'access_token': token,
+            'type': reaction_type  # The type of reaction, e.g., 'LIKE', 'LOVE', etc.
+        }
+        response = requests.post(url, params=payload)
+        if response.status_code == 200:
+            print(f"{YELLOW}SUCCESSFUL | COMMENT ID: {comment_id}{WHITE}")
+            return True
+        else:
+            print(f"{RED}FAILED | COMMENT ID: {comment_id}{WHITE}")
+            return False
+
+    try:
+        with open(token_file, 'r') as file:
+            tokens = file.read().splitlines()
+
+        # Here you should collect comments from each post_id
+        comments_to_react_to = []
+        for post_id in post_ids:
+            # Fetch comments for the post
+            comments_url = f"https://graph.facebook.com/{post_id}/comments"
+            for token in tokens:
+                response = requests.get(comments_url, params={'access_token': token})
+                if response.status_code == 200:
+                    comments_data = response.json().get('data', [])
+                    comments_to_react_to.extend(comment['id'] for comment in comments_data)
+
+        # Limit the number of tokens to use
+        tokens_to_use = tokens[:limit] if limit < len(tokens) else tokens
+
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            futures = []
+            for token in tokens_to_use:
+                for comment_id in comments_to_react_to:
+                    futures.append(executor.submit(react_to_comment, token, comment_id))
+
+            success_count = 0
+            failure_count = 0
+            
+            # Collect results from futures
+            for future in as_completed(futures):
+                if future.result():
+                    success_count += 1
+                else:
+                    failure_count += 1
+
+            print(f"{BRIGHT_BLUE}═════════════════════════════════")    
+            print(f"| COMPLETED: {success_count}  |")
+            print(f"| FAILED: {failure_count}     |")
+            print(f"{BRIGHT_BLUE}═════════════════════════════════")    
+
+    except Exception as e:
+        print(f"{BRIGHT_BLUE}[ERROR] {str(e)}{WHITE}")
+def auto_follow(user_ids, token_file, limit):
+    def follow_user(token, user_id):
+        url = f"https://graph.facebook.com/v19.0/{user_id}/subscribers"
+        response = requests.post(url, headers={'Authorization': f'Bearer {token}'})
+        if response.status_code == 200:
+            print(f"{YELLOW}SUCCESSFUL FOLLOW | USER ID: {user_id}{WHITE}")
+            return True
+        else:
+            print(f"{RED}FAILED TO FOLLOW | USER ID: {user_id}{WHITE}")
+            return False
+
+    try:
+        with open(token_file, 'r') as file:
+            tokens = file.read().splitlines()
+
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            futures = []
+            for token in tokens[:limit]:
+                for user_id in user_ids:
+                    futures.append(executor.submit(follow_user, token, user_id.strip()))  # Strip whitespace from user IDs
+
+            success_count = 0
+            failure_count = 0
+            for future in as_completed(futures):
+                if future.result():
+                    success_count += 1
+                else:
+                    failure_count += 1
+
+            print(f"{BRIGHT_BLUE}═════════════════════════════════")    
+            print(f"{BRIGHT_BLUE}| COMPLETED: {success_count}  |")
+            print(f"{BRIGHT_BLUE}| FAILED: {failure_count}     |")
+            print(f"{BRIGHT_BLUE}═════════════════════════════════")    
+
+    except Exception as e:
+        print(f"{BRIGHT_BLUE}[ERROR] {str(e)}{WHITE}")
+
+def choose_token_file():
+    clear_terminal()
+    print(f"{BRIGHT_BLUE}Choose a token file to use:{WHITE}")
+    print(f"{BRIGHT_BLUE}═════════════════════════════════")    
+    print(f"{BRIGHT_BLUE}1. /sdcard/BOOSTINGTOOL/RPA.TXT")
+    print(f"{BRIGHT_BLUE}═════════════════════════════════")    
+    print(f"{BRIGHT_BLUE}2. /sdcard/BOOSTINGTOOL/FRA.TXT")
+    print(f"{BRIGHT_BLUE}═════════════════════════════════")    
+    print(f"{BRIGHT_BLUE}3. /sdcard/BOOSTINGTOOL/RPAPAGE.TXT")
+    print(f"{BRIGHT_BLUE}═════════════════════════════════")    
+    print(f"{BRIGHT_BLUE}4. /sdcard/BOOSTINGTOOL/FRAPAGE.TXT")
+
+    choice = input("Choose an option (1-4): ")
+    token_files = {
+        '1': '/sdcard/BOOSTINGTOOL/rpa.txt',
+        '2': '/sdcard/BOOSTINGTOOL/fra.txt',
+        '3': '/sdcard/BOOSTINGTOOL/rpapage.txt',
+        '4': '/sdcard/BOOSTINGTOOL/frapage.txt'
+    }
+
+    return token_files.get(choice, None)
+
+def main_menu():
+    while True:
+        clear_terminal()
+        overview()
+        print(f"{YELLOW}MAIN MENU{WHITE}")
+        print(f"{BRIGHT_BLUE}1. AUTO FOLLOW")
+        print(f"{BRIGHT_BLUE}2. AUTO REACT")
+        print(f"{BRIGHT_BLUE}3. AUTO COMMENT")
+        print(f"{BRIGHT_BLUE}4. AUTO COMMENT REACT")
+        print(f"{BRIGHT_BLUE}5. AUTO UNSUBSCRIBE")  # New option for auto-unsubscribe
+        print(f"{BRIGHT_BLUE}0. Exit")
+
+        choice = input("CHOOSE AN OPTION: ")
+        
+        if choice == '0':
+            print(f"{BRIGHT_BLUE}EXITING...{WHITE}")
+            break
+
+        token_file = choose_token_file()
+        if not token_file:
+            print(f"{BRIGHT_BLUE}INVALID SELECTION, RETURNING TO MAIN MENU...{WHITE}")
+            continue
+
+        if choice == '1':
+            user_ids = input("Enter user IDs (comma-separated): ").split(',')
+            limit = int(input("Enter limit for following: "))
+            auto_follow(user_ids, token_file, limit)
+        elif choice == '2':
+            post_ids = input("ENTER POST IDS (comma-separated): ").split(',')
+            limit = int(input("ENTER LIMIT FOR REACTIONS: "))
+            auto_react(post_ids, token_file, limit)
+        elif choice == '3':
+            post_ids = input("ENTER POST IDS (comma-separated): ").split(',')
+            limit = int(input("ENTER LIMIT FOR COMMENTS: "))
+            auto_comment(post_ids, token_file, limit)
+        elif choice == '4':
+            post_ids = input("ENTER POST IDS (comma-separated): ").split(',')
+            limit = int(input("ENTER LIMIT FOR COMMENT REACTIONS: "))
+            auto_comment_react(post_ids, token_file, limit)
+        elif choice == '5':
+            target_ids = input("ENTER PAGE IDS TO UNSUBSCRIBE (comma-separated): ").split(',')
+            limit = int(input("ENTER LIMIT FOR UNSUBSCRIBING: "))
+            
+            with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+                futures = []
+                for token in open(token_file).read().splitlines()[:limit]:
+                    for target_id in target_ids:
+                        futures.append(executor.submit(auto_unsubscribe, token.strip(), target_id.strip()))
+
+                success_count = 0
+                failure_count = 0
+                for future in as_completed(futures):
+                    if future.result():
+                        success_count += 1
+                    else:
+                        failure_count += 1
+
+                print(f"{BRIGHT_BLUE}═════════════════════════════════")    
+                print(f"{BRIGHT_BLUE}| COMPLETED: {success_count}  |")
+                print(f"{BRIGHT_BLUE}| FAILED: {failure_count}     |")
+                print(f"{BRIGHT_BLUE}═════════════════════════════════")    
+
+        else:
+            print(f"{RED}INVALID OPTION! PLEASE TRY AGAIN.{WHITE}")
+
+        # Prompt user if they want to go back to the main menu
+        go_back = input(f"{YELLOW}Do you want to return to the main menu? (y/n): ").strip().lower()
+        if go_back != 'y':
+            print(f"{GREEN}EXITING...{WHITE}")
+            break
+            
+
+async def main():
+    clear_terminal()
+    logo()
+    is_approved = await key()
+    if is_approved:
+        clear_terminal()
+        logo()
+        await main_menu()
+    else:
+        print("Approval required to access commands.")
+        await asyncio.sleep(0.5)
+
+if __name__ == "__main__":
+    asyncio.run(main())
